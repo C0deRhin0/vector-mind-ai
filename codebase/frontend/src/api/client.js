@@ -1,5 +1,5 @@
 /**
- * API Client for Research OS
+ * API Client for vector-mind-ai
  *
  * Endpoints:
  *   POST /api/research          - Full research (non-streaming)

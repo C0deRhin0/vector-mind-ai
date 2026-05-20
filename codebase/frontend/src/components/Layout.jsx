@@ -16,7 +16,7 @@ export default function Layout({ children, currentPage, onNavigate, pages }) {
         {/* Brand */}
         <div className="h-12 flex items-center px-4 border-b border-surface-border">
           <span className="text-sm font-semibold text-text-primary tracking-tight">
-            <span className="text-accent-blue">◆</span> Research OS
+            <span className="text-accent-blue">◆</span> vector-mind-ai
           </span>
         </div>
 
