@@ -1,4 +1,4 @@
-# Research OS
+# vector-mind-ai
 
 A **multi-agent research orchestration platform** that combines RAG (Retrieval-Augmented Generation) with a team of specialized AI agents to research, analyze, synthesize, and generate polished output on any topic.
 
@@ -8,7 +8,7 @@ Think **NotebookLM + multi-agent orchestration** — open source, local-first, a
 
 ## ✨ Key Differentiators vs NotebookLM
 
-| Feature | Google NotebookLM | **Research OS** |
+| Feature | Google NotebookLM | **vector-mind-ai** |
 |---------|-------------------|----------------|
 | **Model** | Gemini only | Bring your own: Ollama (local), OpenAI, Anthropic, Google |
 | **Architecture** | Single model Q&A | **Multi-agent orchestration** — 6 specialized agents collaborate |

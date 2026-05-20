@@ -8,7 +8,7 @@ YELLOW='\033[1;33m'
 NC='\033[0m'
 
 echo -e "${CYAN}╔══════════════════════════════════════════════════╗${NC}"
-echo -e "${CYAN}║           Research OS — Starting Services       ║${NC}"
+echo -e "${CYAN}║           vector-mind-ai — Starting Services       ║${NC}"
 echo -e "${CYAN}╚══════════════════════════════════════════════════╝${NC}"
 
 # ─── 1. Qdrant ──────────────────────────────────────────

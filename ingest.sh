@@ -6,7 +6,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-echo -e "${YELLOW}Research OS — Document Ingest${NC}"
+echo -e "${YELLOW}vector-mind-ai — Document Ingest${NC}"
 
 # Default to ./documents directory
 DOCS_DIR="${1:-./documents}"
