@@ -1,5 +1,5 @@
 """
-Research OS — FastAPI Server Entry Point
+vector-mind-ai — FastAPI Server Entry Point
 Multi-agent research orchestration platform.
 """
 
@@ -9,7 +9,7 @@ from api.routes_research import router as research_router
 from api.routes_admin import router as admin_router
 
 app = FastAPI(
-    title="Research OS",
+    title="vector-mind-ai",
     version="1.0.0",
     description="Multi-agent research orchestration with grounded RAG",
 )

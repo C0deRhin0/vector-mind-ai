@@ -1,5 +1,5 @@
 """
-Research OS — Backend Configuration
+vector-mind-ai — Backend Configuration
 Loads from environment variables with sensible defaults.
 """
 

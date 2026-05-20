@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Document ingestion CLI for Research OS.
+Document ingestion CLI for vector-mind-ai.
 
 Usage:
     python main.py --dir /path/to/documents
@@ -39,7 +39,7 @@ def ingest_file(path: Path) -> dict:
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Research OS — ingestion pipeline")
+    parser = argparse.ArgumentParser(description="vector-mind-ai — ingestion pipeline")
     parser.add_argument("--dir", type=Path, default=DOCS_DIR, help="Directory of documents")
     parser.add_argument("--file", type=Path, help="Single file to ingest")
     parser.add_argument("--reset", action="store_true", help="Delete and recreate collection")
