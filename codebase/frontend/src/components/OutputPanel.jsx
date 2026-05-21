@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Copy, Check, Download, FileText, Twitter, Presentation, Headphones, FileSpreadsheet } from 'lucide-react'
+import { Copy, Check, Download, FileText, Twitter, Presentation, Headphones, FileSpreadsheet, Brain } from 'lucide-react'
 
 const FORMAT_ICONS = {
   research_brief: FileSpreadsheet,
@@ -19,7 +19,7 @@ const FORMAT_LABELS = {
   executive_summary: 'Executive Summary',
 }
 
-export default function OutputPanel({ content = '', format = 'research_brief', critique = '', factCheck = '', isLoading = false }) {
+export default function OutputPanel({ content = '', format = 'research_brief', critique = '', factCheck = '', isLoading = false, showExamples = false, exampleQueries = [], onExampleClick = () => {} }) {
   const [copied, setCopied] = useState(false)
   const [showSidePanels, setShowSidePanels] = useState(false)
 
@@ -56,6 +56,30 @@ export default function OutputPanel({ content = '', format = 'research_brief', c
   }
 
   if (!content) {
+    if (showExamples) {
+      return (
+        <div className="flex items-center justify-center h-full p-8">
+          <div className="text-center max-w-md">
+            <Brain size={40} className="mx-auto text-text-muted mb-4" />
+            <h2 className="text-lg font-semibold text-text-primary mb-2">What would you like to research?</h2>
+            <p className="text-sm text-text-muted mb-6">
+              Ask any question and the multi-agent system will research, analyze, and synthesize findings for you.
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              {exampleQueries.map((q, i) => (
+                <button
+                  key={i}
+                  onClick={() => onExampleClick(q)}
+                  className="text-left px-4 py-2.5 bg-surface-raised border border-surface-border rounded-lg text-sm text-text-secondary hover:border-surface-hover hover:text-text-primary transition-all"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )
+    }
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-8">
         <FileText size={32} className="text-text-muted mb-3" />
