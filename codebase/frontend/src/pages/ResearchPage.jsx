@@ -1,9 +1,9 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { Send, Loader2, Sparkles, Brain, BookOpen } from 'lucide-react'
+import { Send, Loader2, Sparkles, BookOpen, Brain } from 'lucide-react'
 import AgentView from '../components/AgentView'
 import SourcePanel from '../components/SourcePanel'
 import OutputPanel from '../components/OutputPanel'
-import { runResearch, streamResearch } from '../api/client'
+import { streamResearch } from '../api/client'
 
 const EXAMPLE_QUERIES = [
   'What are the key differences between GPT-4 and Claude?',
@@ -180,6 +180,9 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
                 critique={critique}
                 factCheck={factCheck}
                 isLoading={isRunning && !streamingContent}
+                showExamples={showExamples && !streamingContent && !isRunning}
+                exampleQueries={EXAMPLE_QUERIES}
+                onExampleClick={(q) => { setQuery(q); setShowExamples(false); inputRef.current?.focus() }}
               />
             )}
             {activeTab === 'sources' && (
@@ -197,30 +200,6 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
               </div>
             )}
           </div>
-
-          {/* Floating example pills (when empty) */}
-          {showExamples && !streamingContent && !isRunning && (
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="text-center max-w-md pointer-events-auto">
-                <Brain size={40} className="mx-auto text-text-muted mb-4" />
-                <h2 className="text-lg font-semibold text-text-primary mb-2">What would you like to research?</h2>
-                <p className="text-sm text-text-muted mb-6">
-                  Ask any question and the multi-agent system will research, analyze, and synthesize findings for you.
-                </p>
-                <div className="grid grid-cols-1 gap-2">
-                  {EXAMPLE_QUERIES.map((q, i) => (
-                    <button
-                      key={i}
-                      onClick={() => { setQuery(q); setShowExamples(false); inputRef.current?.focus() }}
-                      className="text-left px-4 py-2.5 bg-surface-raised border border-surface-border rounded-lg text-sm text-text-secondary hover:border-surface-hover hover:text-text-primary transition-all pointer-events-auto"
-                    >
-                      {q}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
