@@ -252,7 +252,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
           {isRunning ? (
             <button
               onClick={handleCancel}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-accent-red/10 text-accent-red hover:bg-accent-red/20"
+              className="h-10 flex items-center gap-2 px-4 rounded-lg text-sm font-medium transition-all bg-accent-red/10 text-accent-red hover:bg-accent-red/20"
             >
               <StopCircle size={16} />
               Stop
@@ -262,7 +262,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
               onClick={handleSubmit}
               disabled={!query.trim()}
               className={`
-                flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                h-10 flex items-center gap-2 px-4 rounded-lg text-sm font-medium transition-all
                 ${query.trim()
                   ? 'bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20'
                   : 'bg-surface-raised text-text-muted cursor-not-allowed'
