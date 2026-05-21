@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react'
-import { Send, Loader2, Sparkles, BookOpen, Brain } from 'lucide-react'
+import { Send, Loader2, Sparkles, BookOpen, Brain, StopCircle, Upload } from 'lucide-react'
 import AgentView from '../components/AgentView'
 import SourcePanel from '../components/SourcePanel'
 import OutputPanel from '../components/OutputPanel'
@@ -26,6 +26,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
   const [factCheck, setFactCheck] = useState('')
   const [showExamples, setShowExamples] = useState(true)
   const inputRef = useRef(null)
+  const cancelRef = useRef(null) // Holds cancel function for EventSource
 
   // Keyboard shortcut
   useEffect(() => {
@@ -51,6 +52,18 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
     }
   }, [lastState])
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => cancelRef.current?.()
+  }, [])
+
+  const handleCancel = useCallback(() => {
+    cancelRef.current?.()
+    cancelRef.current = null
+    setIsRunning(false)
+    setCurrentAgent('')
+  }, [])
+
   const handleSubmit = useCallback(async () => {
     if (!query.trim() || isRunning) return
     setIsRunning(true)
@@ -62,7 +75,15 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
     setShowExamples(false)
     setActiveTab('agents')
 
-    const cancelStream = streamResearch(query.trim(), outputFormat, depth, {
+    const submittedQuery = query.trim()
+    setQuery('') // Clear input immediately
+
+    // Auto-timeout: cancel after 5 minutes
+    const timeoutId = setTimeout(() => {
+      handleCancel()
+    }, 300000)
+
+    const close = streamResearch(submittedQuery, outputFormat, depth, {
       onStatus: (msg, agent) => {
         setAgentTrace(prev => [...prev, { agent: agent || 'system', status: 'running', message: msg, timestamp: Date.now() }])
       },
@@ -86,6 +107,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
         setActiveTab('output')
       },
       onDone: (state) => {
+        clearTimeout(timeoutId)
         if (state) {
           setSources(state.sources_used || [])
           setCritique(state.critique || '')
@@ -95,14 +117,22 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
         }
         setIsRunning(false)
         setCurrentAgent('')
+        cancelRef.current = null
       },
       onError: (msg) => {
+        clearTimeout(timeoutId)
         console.error('Research error:', msg)
         setIsRunning(false)
         setCurrentAgent('')
+        cancelRef.current = null
       },
     })
-  }, [query, outputFormat, depth, isRunning, onResearchComplete])
+
+    cancelRef.current = () => {
+      clearTimeout(timeoutId)
+      close()
+    }
+  }, [query, outputFormat, depth, isRunning, onResearchComplete, handleCancel])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -152,7 +182,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
           <div className="flex items-center gap-1 px-4 pt-2 border-b border-surface-border">
             {[
               { id: 'output', label: 'Output', icon: BookOpen },
-              { id: 'sources', label: 'Sources', icon: Brain },
+              { id: 'sources', label: 'Sources', icon: Upload },
               { id: 'agents', label: 'Agents', icon: Brain },
             ].map(tab => (
               <button
@@ -205,7 +235,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
 
       {/* ─── Input Bar ────────────────────────────────── */}
       <div className="border-t border-surface-border p-3 flex-shrink-0">
-        <div className="flex items-end gap-2 max-w-4xl mx-auto">
+        <div className="flex items-center gap-2 max-w-4xl mx-auto">
           <div className="flex-1 relative">
             <textarea
               ref={inputRef}
@@ -219,24 +249,30 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
               disabled={isRunning}
             />
           </div>
-          <button
-            onClick={handleSubmit}
-            disabled={!query.trim() || isRunning}
-            className={`
-              flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
-              ${query.trim() && !isRunning
-                ? 'bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20'
-                : 'bg-surface-raised text-text-muted cursor-not-allowed'
-              }
-            `}
-          >
-            {isRunning ? (
-              <Loader2 size={16} className="spin-slow" />
-            ) : (
+          {isRunning ? (
+            <button
+              onClick={handleCancel}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all bg-accent-red/10 text-accent-red hover:bg-accent-red/20"
+            >
+              <StopCircle size={16} />
+              Stop
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={!query.trim()}
+              className={`
+                flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all
+                ${query.trim()
+                  ? 'bg-accent-blue/10 text-accent-blue hover:bg-accent-blue/20'
+                  : 'bg-surface-raised text-text-muted cursor-not-allowed'
+                }
+              `}
+            >
               <Send size={16} />
-            )}
-            {isRunning ? 'Researching...' : 'Research'}
-          </button>
+              Research
+            </button>
+          )}
         </div>
       </div>
     </div>

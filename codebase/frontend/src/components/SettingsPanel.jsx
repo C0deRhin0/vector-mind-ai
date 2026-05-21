@@ -44,8 +44,9 @@ export default function SettingsPanel() {
   }
 
   const handleSave = () => {
+    const map = { outputFormat: 'format', depth: 'depth', temperature: 'temp', maxSources: 'sources' }
     Object.entries(settings).forEach(([key, value]) => {
-      localStorage.setItem(`research_${key === 'outputFormat' ? 'format' : key === 'depth' ? 'depth' : key === 'temperature' ? 'temp' : 'sources'}`, value.toString())
+      localStorage.setItem(`research_${map[key] || key}`, value.toString())
     })
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
@@ -156,11 +157,14 @@ export default function SettingsPanel() {
             )}
             {diagnostics.llm_response && (
               <div className="text-xs text-text-muted ml-6">
-                LLM response: "{diagnostics.llm_response}"
+                LLM: "{diagnostics.llm_response}"
               </div>
             )}
-            {diagnostics.error && (
-              <div className="text-xs text-accent-red ml-6">{diagnostics.error}</div>
+            {diagnostics.qdrant_error && (
+              <div className="text-xs text-accent-red ml-6">{diagnostics.qdrant_error}</div>
+            )}
+            {diagnostics.llm_error && (
+              <div className="text-xs text-accent-red ml-6">LLM error: {diagnostics.llm_error}</div>
             )}
           </div>
         ) : loading ? (
