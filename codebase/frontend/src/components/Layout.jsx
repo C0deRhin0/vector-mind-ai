@@ -16,7 +16,7 @@ export default function Layout({ children, currentPage, onNavigate, pages }) {
         {/* Brand */}
         <div className="h-12 flex items-center px-4 border-b border-surface-border">
           <span className="text-sm font-semibold text-text-primary tracking-tight">
-            <span className="text-accent-blue">◆</span> vector-mind-ai
+            <span className="text-accent-blue">◈</span> Vector Mind
           </span>
         </div>
 
@@ -45,13 +45,7 @@ export default function Layout({ children, currentPage, onNavigate, pages }) {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-surface-border">
-          <div className="flex items-center gap-2 text-xs text-text-muted">
-            <span className="w-2 h-2 rounded-full bg-accent-green" />
-            System Ready
-          </div>
-        </div>
+        {/* Footer spacer */}
       </aside>
 
       {/* ─── Main Content ────────────────────────────── */}
