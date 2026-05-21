@@ -73,7 +73,9 @@ class Orchestrator:
         output_format: str = "research_brief",
         depth: int = 1,
         sources: Optional[list[dict]] = None,
+        agent_instructions: Optional[dict[str, str]] = None,
     ) -> ResearchState:
+        agent_instructions = agent_instructions or {}
         """
         Run the full multi-agent research pipeline.
 
@@ -226,11 +228,14 @@ class Orchestrator:
         query: str,
         output_format: str = "research_brief",
         depth: int = 1,
+        agent_instructions: Optional[dict[str, str]] = None,
     ) -> AsyncGenerator[dict, None]:
         """
         Stream research progress events for real-time UI updates.
         Yields dicts with type: status, agent_start, agent_complete, token, error, done
+        agent_instructions: optional dict of custom instructions per agent key
         """
+        agent_instructions = agent_instructions or {}
         state = ResearchState(
             session_id=str(uuid.uuid4())[:8],
             query=query,
@@ -251,7 +256,8 @@ class Orchestrator:
             # Phase 2: Plan
             yield {"type": "agent_start", "agent": "planner", "label": "Planning research strategy"}
             state.status = "planning"
-            plan_input = AgentInput(query=query, sources=all_sources[:20])
+            plan_instructions = agent_instructions.get("planner", "")
+            plan_input = AgentInput(query=query, sources=all_sources[:20], instructions=plan_instructions)
             plan_result = await self.planner.run(plan_input)
             state.plan = plan_result.metadata.get("plan", {})
             sub_questions = state.plan.get("sub_questions", [query])
@@ -267,7 +273,7 @@ class Orchestrator:
                 sq_sources = retrieve_sources(sq)
                 sq_web = await self.web_search.search(sq)
                 sq_all = sq_sources + sq_web
-                research_input = AgentInput(query=sq, sources=sq_all[:15], context=f"Main: {query}")
+                research_input = AgentInput(query=sq, sources=sq_all[:15], context=f"Main: {query}", instructions=agent_instructions.get("researcher", ""))
                 result = await self.researcher.run(research_input)
                 all_findings.append(result.content)
                 self.knowledge_graph.add_research_finding(query, sq, result.content, sq_all[:5])
@@ -279,7 +285,7 @@ class Orchestrator:
             # Phase 4: Analyze
             yield {"type": "agent_start", "agent": "analyst", "label": "Analyzing and synthesizing findings"}
             state.status = "analyzing"
-            analysis_input = AgentInput(query=query, context=state.research_findings, sources=all_sources)
+            analysis_input = AgentInput(query=query, context=state.research_findings, sources=all_sources, instructions=agent_instructions.get("analyst", ""))
             analysis_result = await self.analyst.run(analysis_input)
             state.analysis = analysis_result.content
             self.knowledge_graph.add_analysis(query, state.analysis)
@@ -289,7 +295,7 @@ class Orchestrator:
             # Phase 5: Write
             yield {"type": "agent_start", "agent": "writer", "label": f"Writing {output_format.replace('_', ' ')}"}
             state.status = "writing"
-            write_input = AgentInput(query=query, context=state.analysis, sources=all_sources, parameters={"output_format": output_format})
+            write_input = AgentInput(query=query, context=state.analysis, sources=all_sources, parameters={"output_format": output_format}, instructions=agent_instructions.get("writer", ""))
             async for token in self.writer.stream(write_input):
                 yield {"type": "token", "text": token}
             # Also get the full output
@@ -302,7 +308,8 @@ class Orchestrator:
             if depth >= 2:
                 yield {"type": "agent_start", "agent": "critic", "label": "Reviewing for quality and gaps"}
                 state.status = "reviewing"
-                critic_input = AgentInput(query=query, context=state.analysis, instructions=f"Review this {output_format}:\n\n{state.output}", sources=all_sources)
+                critic_instructions = agent_instructions.get("critic", "")
+                critic_input = AgentInput(query=query, context=state.analysis, instructions=f"{critic_instructions}\nReview this {output_format}:\n\n{state.output}".strip(), sources=all_sources)
                 critic_result = await self.critic.run(critic_input)
                 state.critique = critic_result.content
                 yield {"type": "agent_complete", "agent": "critic"}
@@ -310,7 +317,7 @@ class Orchestrator:
 
                 # Refine
                 yield {"type": "agent_start", "agent": "writer", "label": "Refining based on review"}
-                revise_input = AgentInput(query=query, context=state.analysis, instructions=f"Revise based on:\n{state.critique}\n\nOriginal:\n{state.output}", sources=all_sources, parameters={"output_format": output_format})
+                revise_input = AgentInput(query=query, context=state.analysis, instructions=f"{agent_instructions.get('writer', '')}\nRevise based on:\n{state.critique}\n\nOriginal:\n{state.output}".strip(), sources=all_sources, parameters={"output_format": output_format})
                 revised = await self.writer.run(revise_input)
                 state.output = revised.content
                 yield {"type": "agent_complete", "agent": "writer"}
@@ -320,7 +327,7 @@ class Orchestrator:
             if depth >= 3:
                 yield {"type": "agent_start", "agent": "fact_checker", "label": "Verifying factual claims"}
                 state.status = "fact_checking"
-                fc_input = AgentInput(query=query, instructions=f"Fact-check:\n\n{state.output}", sources=all_sources)
+                fc_input = AgentInput(query=query, instructions=f"{agent_instructions.get('fact_checker', '')}\nFact-check:\n\n{state.output}".strip(), sources=all_sources)
                 fc_result = await self.fact_checker.run(fc_input)
                 state.fact_check = fc_result.content
                 yield {"type": "agent_complete", "agent": "fact_checker", "confidence": fc_result.confidence}

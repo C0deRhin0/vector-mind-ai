@@ -104,6 +104,7 @@ async def stream_research(
     question: str = Query(..., description="Research question"),
     output_format: str = Query("research_brief", description="Output format"),
     depth: int = Query(1, description="Research depth (1-3)"),
+    agent_instructions: Optional[str] = Query(None, description="JSON-encoded custom instructions per agent"),
 ):
     """
     SSE stream for real-time research progress.
@@ -115,11 +116,19 @@ async def stream_research(
       {"type": "done", "state": {...}}
       {"type": "error", "message": "..."}
     """
+    parsed_instructions: dict[str, str] = {}
+    if agent_instructions:
+        try:
+            parsed_instructions = json.loads(agent_instructions)
+        except json.JSONDecodeError:
+            pass
+
     async def event_stream():
         async for event in orchestrator.stream_research(
             query=question,
             output_format=output_format,
             depth=min(depth, 3),
+            agent_instructions=parsed_instructions,
         ):
             yield f"data: {json.dumps(event)}\n\n"
 
