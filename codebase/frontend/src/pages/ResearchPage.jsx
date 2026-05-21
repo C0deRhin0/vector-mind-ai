@@ -25,6 +25,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
   const [critique, setCritique] = useState('')
   const [factCheck, setFactCheck] = useState('')
   const [showExamples, setShowExamples] = useState(true)
+  const [agentInstructions, setAgentInstructions] = useState({})
   const inputRef = useRef(null)
   const cancelRef = useRef(null) // Holds cancel function for EventSource
 
@@ -126,13 +127,13 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
         setCurrentAgent('')
         cancelRef.current = null
       },
-    })
+    }, agentInstructions)
 
     cancelRef.current = () => {
       clearTimeout(timeoutId)
       close()
     }
-  }, [query, outputFormat, depth, isRunning, onResearchComplete, handleCancel])
+  }, [query, outputFormat, depth, isRunning, onResearchComplete, handleCancel, agentInstructions])
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -226,6 +227,7 @@ export default function ResearchPage({ onResearchComplete, lastState }) {
                   trace={agentTrace}
                   isRunning={isRunning}
                   currentAgent={currentAgent}
+                  onInstructionsChange={setAgentInstructions}
                 />
               </div>
             )}

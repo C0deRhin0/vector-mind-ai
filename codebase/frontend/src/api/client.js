@@ -42,8 +42,12 @@ export async function runResearch(question, outputFormat = 'research_brief', dep
   return post('/research', { question, output_format: outputFormat, depth });
 }
 
-export function streamResearch(question, outputFormat = 'research_brief', depth = 1, callbacks) {
-  const url = `${API_BASE}/research/stream?question=${encodeURIComponent(question)}&output_format=${outputFormat}&depth=${depth}`;
+export function streamResearch(question, outputFormat = 'research_brief', depth = 1, callbacks, agentInstructions = {}) {
+  let url = `${API_BASE}/research/stream?question=${encodeURIComponent(question)}&output_format=${outputFormat}&depth=${depth}`;
+  const entries = Object.entries(agentInstructions).filter(([, v]) => v.trim());
+  if (entries.length > 0) {
+    url += `&agent_instructions=${encodeURIComponent(JSON.stringify(agentInstructions))}`;
+  }
   const es = new EventSource(url);
 
   es.onmessage = (e) => {
