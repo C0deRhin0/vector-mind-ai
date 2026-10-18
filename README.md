@@ -6,6 +6,29 @@ Think **NotebookLM + multi-agent orchestration** — open source, local-first, a
 
 ---
 
+## Research stages and shared evidence
+
+The orchestrator runs specialized stages over shared research context. Optional critique and fact-checking extend the core plan/research/analyze/write sequence.
+
+```mermaid
+flowchart LR
+Q["Research question"]:::source --> P["Planner"]:::process
+    P --> R["Researcher"]:::process
+    D[("Qdrant documents")]:::store --> R
+    W["Optional web search"]:::source --> R
+    R --> A["Analyst"]:::process
+    A --> O["Writer"]:::process
+    O --> C["Optional critic<br/>and fact checker"]:::review
+    C --> E["Research output<br/>sources and graph"]:::result
+    classDef source fill:#e0f2fe,stroke:#0284c7,color:#0c4a6e
+    classDef process fill:#ede9fe,stroke:#7c3aed,color:#3b0764
+    classDef store fill:#dcfce7,stroke:#16a34a,color:#14532d
+    classDef review fill:#fef3c7,stroke:#d97706,color:#78350f
+    classDef result fill:#f1f5f9,stroke:#475569,color:#0f172a
+```
+
+The application source lives under the repository’s inner `codebase/` directory. Configure the provider in `.env.example`, then use the root launchers. Local mode needs Ollama and Qdrant; cloud providers and optional web search have separate credentials.
+
 ## ✨ Key Differentiators vs NotebookLM
 
 | Feature | Google NotebookLM | **vector-mind-ai** |
