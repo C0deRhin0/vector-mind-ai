@@ -289,3 +289,13 @@ GOOGLE_MODEL=gemini-2.5-flash
 ## 📄 License
 
 MIT
+
+## Captures
+
+Research and provider controls before model inference.
+
+![Running frontend · research interface; model inference not exercised](docs/screenshots/research.webp)
+
+![Running frontend · provider settings interface](docs/screenshots/settings.webp)
+
+Full capture descriptions and provenance: [captures.json](docs/screenshots/captures.json).

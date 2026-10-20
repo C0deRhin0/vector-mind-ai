@@ -1,0 +1,26 @@
+{
+  "project": "Vector Mind AI",
+  "kind": "Interface",
+  "note": "Research and provider controls before model inference.",
+  "capturedAt": "2026-10-23T05:34:31.293Z",
+  "screens": [
+    {
+      "file": "research.webp",
+      "caption": "Running frontend · research interface; model inference not exercised",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "settings.webp",
+      "caption": "Running frontend · provider settings interface",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "file": "knowledge.webp",
+      "caption": "Running frontend · knowledge interface before ingestion",
+      "width": 1440,
+      "height": 1000
+    }
+  ]
+}
